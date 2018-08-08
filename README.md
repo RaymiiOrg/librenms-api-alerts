@@ -1,5 +1,7 @@
 This script talks to the LibreNMS API to receive a list of down devices and alerts. The LibreNMS dashboard provides widgets for alerts and host statusses, but there is no easy way to access that output via the API. Using Python I was able to get certain information and output it as HTML or text using PrettyTable. It can be included in other systems or be used in a chain of monitoring customizations. 
 
+[More information here](https://raymii.org/s/software/Python_script_to_talk_to_LibreNMS_API_and_get_alerts_and_hosts.html)
+
 ### Installation
 
 On Ubuntu you need to install `prettytable` and python:
