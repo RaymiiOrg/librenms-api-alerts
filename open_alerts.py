@@ -107,11 +107,12 @@ warning_alerts.field_names = ["Hostname", "Alert rule", "OS Version", "Location"
 
 for device in devices:
 	if device["status_reason"] == "icmp":
-		device_down_since = device["last_ping"]
-		device_location = re.sub(r'\[.*\]', '', device["location"]) # remove gps coords
-		device_hostname = librenms_api.translate_device_ip_to_sysname(device)
-		device_purpose = device["purpose"].rstrip()
-		icmp_down_devices.add_row([device_hostname, device_purpose, device_down_since, device_location])
+		if device["ignore"] == 0 or device["disabled"] == 0:
+			device_down_since = device["last_ping"]
+			device_location = re.sub(r'\[.*\]', '', device["location"]) # remove gps coords
+			device_hostname = librenms_api.translate_device_ip_to_sysname(device)
+			device_purpose = device["purpose"].rstrip()
+			icmp_down_devices.add_row([device_hostname, device_purpose, device_down_since, device_location])
 
 for alert in alerts["alerts"]:
 	alert_rule = librenms_api.get_alert_rule(alert["rule_id"])
