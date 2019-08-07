@@ -14,17 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import json
-import ssl 
-import sys
+import requests
 import re
 from prettytable import PrettyTable
-try:
-    # For Python 3.0 and later
-    from urllib.request import urlopen, Request
-except ImportError:
-    # Fall back to Python 2's urllib2
-    from urllib2 import urlopen, Request
 
 auth_token = ""
 api_url = "https://example.org/librenms/api/v0/"
@@ -37,20 +29,11 @@ request_headers = {
 	"Connection": "keep-alive" 
 }
 
-# https://gist.github.com/benhagen/5296795
 def is_ipv4(ip):
-	match = re.match("^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$", ip)
-	if not match:
-		return False
-	quad = []
-	for number in match.groups():
-		quad.append(int(number))
-	if quad[0] < 1:
-		return False
-	for number in quad:
-		if number > 255 or number < 0:
-			return False
-	return True
+    pieces = ip.split('.')
+    if len(pieces) != 4: return False
+    try: return all(0<=int(p)<256 for p in pieces)
+    except ValueError: return False
 
 class LibreNMSAPI(object):
 	"""Mapping for certain LibreNMS API endpoints
@@ -59,37 +42,31 @@ class LibreNMSAPI(object):
 	def __init__(self, auth_token=auth_token, request_headers=request_headers, api_url=api_url):
 		super(LibreNMSAPI, self).__init__()
 		self.api_url = api_url
-		self.request_headers = request_headers
+		self.headers = request_headers
 		self.auth_token = auth_token
 
 	def get_alert_rule(self,rule_id):
-		rule_req = Request(self.api_url + "rules/" + str(rule_id), headers=self.request_headers)
-		rule_contents = urlopen(rule_req).read()
-		return json.loads(rule_contents)["rules"][0]
+		req = self.api_url + "rules/" + str(rule_id)
+		return requests.get(req, headers=self.headers).json()["rules"][0]
 
 	def get_alert(self, alert_id):
-		alert_req = Request(self.api_url + "alert/" + str(alert_id), headers=self.request_headers)
-		alert_contents = urlopen(alert_req).read()
-		return json.loads(alert_contents)
+		req = self.api_url + "alert/" + str(alert_id)
+		return requests.get(req, headers=self.headers).json()
 
 	def get_alerts(self, state="ALL"):
 		if state == "ALL":
-			alerts_req = Request(self.api_url + "alerts", headers=self.request_headers)
+			req = self.api_url + "alerts"
 		else:
-			alerts_req = Request(self.api_url + "alerts?state=" + state, headers=self.request_headers)
-		alerts_contents = urlopen(alerts_req).read()
-		return json.loads(alerts_contents)
+			req = self.api_url + "alerts?state=" + state
+		return requests.get(req, headers=self.headers).json()
 
 	def get_device(self, device_id):
-		device_req = Request(self.api_url + "devices/" + str(device_id), headers=self.request_headers)
-		device_contents = urlopen(device_req).read()
-		return json.loads(device_contents)["devices"][0]
+		req = self.api_url + "devices/" + str(device_id)
+		return requests.get(req, headers=self.headers).json()["devices"][0]
 
 	def get_devices(self):
-		devices_req = Request(self.api_url + "devices", headers=self.request_headers)
-		devices_contents = urlopen(devices_req).read()
-		return json.loads(devices_contents)["devices"]
-
+		req = self.api_url + "devices"
+		return requests.get(req, headers=self.headers).json()["devices"]
 
 	def translate_device_ip_to_sysname(self, device):
 		"""If hostname is an IPv4, return the sysname, 
@@ -146,8 +123,3 @@ if critical_alerts.rowcount > 0:
 print("<h2>Warning alerts: ({0}) </h2>".format(warning_alerts.rowcount))
 if warning_alerts.rowcount > 0:
 	print(warning_alerts.get_html_string(attributes={"border":"1"}))
-
-
-
-
-
