@@ -15,11 +15,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import json
-import urllib2
 import ssl 
 import sys
 import re
 from prettytable import PrettyTable
+try:
+    # For Python 3.0 and later
+    from urllib.request import urlopen, Request
+except ImportError:
+    # Fall back to Python 2's urllib2
+    from urllib2 import urlopen, Request
 
 auth_token = ""
 api_url = "https://example.org/librenms/api/v0/"
@@ -58,31 +63,31 @@ class LibreNMSAPI(object):
 		self.auth_token = auth_token
 
 	def get_alert_rule(self,rule_id):
-		rule_req = urllib2.Request(self.api_url + "rules/" + str(rule_id), headers=self.request_headers)
-		rule_contents = urllib2.urlopen(rule_req).read()
+		rule_req = Request(self.api_url + "rules/" + str(rule_id), headers=self.request_headers)
+		rule_contents = urlopen(rule_req).read()
 		return json.loads(rule_contents)["rules"][0]
 
 	def get_alert(self, alert_id):
-		alert_req = urllib2.Request(self.api_url + "alert/" + str(alert_id), headers=self.request_headers)
-		alert_contents = urllib2.urlopen(alert_req).read()
+		alert_req = Request(self.api_url + "alert/" + str(alert_id), headers=self.request_headers)
+		alert_contents = urlopen(alert_req).read()
 		return json.loads(alert_contents)
 
 	def get_alerts(self, state="ALL"):
 		if state == "ALL":
-			alerts_req = urllib2.Request(self.api_url + "alerts", headers=self.request_headers)
+			alerts_req = Request(self.api_url + "alerts", headers=self.request_headers)
 		else:
-			alerts_req = urllib2.Request(self.api_url + "alerts?state=" + state, headers=self.request_headers)
-		alerts_contents = urllib2.urlopen(alerts_req).read()
+			alerts_req = Request(self.api_url + "alerts?state=" + state, headers=self.request_headers)
+		alerts_contents = urlopen(alerts_req).read()
 		return json.loads(alerts_contents)
 
 	def get_device(self, device_id):
-		device_req = urllib2.Request(self.api_url + "devices/" + str(device_id), headers=self.request_headers)
-		device_contents = urllib2.urlopen(device_req).read()
+		device_req = Request(self.api_url + "devices/" + str(device_id), headers=self.request_headers)
+		device_contents = urlopen(device_req).read()
 		return json.loads(device_contents)["devices"][0]
 
 	def get_devices(self):
-		devices_req = urllib2.Request(self.api_url + "devices", headers=self.request_headers)
-		devices_contents = urllib2.urlopen(devices_req).read()
+		devices_req = Request(self.api_url + "devices", headers=self.request_headers)
+		devices_contents = urlopen(devices_req).read()
 		return json.loads(devices_contents)["devices"]
 
 
@@ -130,15 +135,15 @@ for alert in alerts["alerts"]:
 		if alert_severity == "critical":
 			critical_alerts.add_row([device_hostname, alert_rule["name"], device["version"], device_location])
 
-print("<h2>Devices Down: ({0})</h2> ").format(icmp_down_devices.rowcount)
+print("<h2>Devices Down: ({0})</h2> ".format(icmp_down_devices.rowcount))
 if icmp_down_devices.rowcount > 0:
 	print(icmp_down_devices.get_html_string(attributes={"border":"1"}))
 
-print("<h2>Critical alerts: ({0})</h2>").format(critical_alerts.rowcount)
+print("<h2>Critical alerts: ({0})</h2>".format(critical_alerts.rowcount))
 if critical_alerts.rowcount > 0:
 	print(critical_alerts.get_html_string(attributes={"border":"1"}))
 
-print("<h2>Warning alerts: ({0}) </h2>").format(warning_alerts.rowcount)
+print("<h2>Warning alerts: ({0}) </h2>".format(warning_alerts.rowcount))
 if warning_alerts.rowcount > 0:
 	print(warning_alerts.get_html_string(attributes={"border":"1"}))
 
