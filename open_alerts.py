@@ -39,7 +39,7 @@ request_headers = {
 
 # https://gist.github.com/benhagen/5296795
 def is_ipv4(ip):
-	match = re.match("^(\d{0,3})\.(\d{0,3})\.(\d{0,3})\.(\d{0,3})$", ip)
+	match = re.match("^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$", ip)
 	if not match:
 		return False
 	quad = []
