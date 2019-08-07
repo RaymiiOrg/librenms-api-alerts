@@ -58,12 +58,12 @@ class LibreNMSAPI(object):
 		self.auth_token = auth_token
 
 	def get_alert_rule(self,rule_id):
-		rule_req = urllib2.Request(self.api_url + "rules/" + rule_id, headers=self.request_headers)
+		rule_req = urllib2.Request(self.api_url + "rules/" + str(rule_id), headers=self.request_headers)
 		rule_contents = urllib2.urlopen(rule_req).read()
 		return json.loads(rule_contents)["rules"][0]
 
 	def get_alert(self, alert_id):
-		alert_req = urllib2.Request(self.api_url + "alert/" + alert_id, headers=self.request_headers)
+		alert_req = urllib2.Request(self.api_url + "alert/" + str(alert_id), headers=self.request_headers)
 		alert_contents = urllib2.urlopen(alert_req).read()
 		return json.loads(alert_contents)
 
@@ -76,7 +76,7 @@ class LibreNMSAPI(object):
 		return json.loads(alerts_contents)
 
 	def get_device(self, device_id):
-		device_req = urllib2.Request(self.api_url + "devices/" + device_id, headers=self.request_headers)
+		device_req = urllib2.Request(self.api_url + "devices/" + str(device_id), headers=self.request_headers)
 		device_contents = urllib2.urlopen(device_req).read()
 		return json.loads(device_contents)["devices"][0]
 
