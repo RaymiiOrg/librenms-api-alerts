@@ -53,7 +53,7 @@ class LibreNMSAPI(object):
 		req = self.api_url + "alert/" + str(alert_id)
 		return requests.get(req, headers=self.headers).json()
 
-	def get_alerts(self, state="ALL"):
+	def list_alerts(self, state="ALL"):
 		if state == "ALL":
 			req = self.api_url + "alerts"
 		else:
@@ -64,7 +64,7 @@ class LibreNMSAPI(object):
 		req = self.api_url + "devices/" + str(device_id)
 		return requests.get(req, headers=self.headers).json()["devices"][0]
 
-	def get_devices(self):
+	def list_devices(self):
 		req = self.api_url + "devices"
 		return requests.get(req, headers=self.headers).json()["devices"]
 
@@ -77,8 +77,8 @@ class LibreNMSAPI(object):
 		return device["hostname"]
 
 librenms_api = LibreNMSAPI(auth_token=auth_token, request_headers=request_headers, api_url=api_url)
-alerts = librenms_api.get_alerts()
-devices = librenms_api.get_devices()
+alerts = librenms_api.list_alerts()
+devices = librenms_api.list_devices()
 
 icmp_down_devices = PrettyTable()
 icmp_down_devices.field_names = ["Hostname", "Notes", "Down since", "Location"]
