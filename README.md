@@ -4,9 +4,17 @@ This script talks to the LibreNMS API to receive a list of down devices and aler
 
 ### Installation
 
-On Ubuntu you need to install `prettytable` and python:
+On Ubuntu 18.04 with default pvthon3 you need to install `prettytable`:
 
-	apt-get install python-prettytable python
+	sudo apt install python3-prettytable
+
+On Ubuntu prior version if you want to install python3:
+
+	sudo apt install python3-prettytable python3
+
+On Ubuntu prior version if you want to install python2:
+
+	sudo apt install python-prettytable python-requests python
 
 ### Usage
 
